@@ -1,4 +1,7 @@
 /*MACHINE LEARNING PROJECT ON HEART DISEASE DATASET*/
+/* Here I provide my colab notebook link for an overview how this code was worked
+https://colab.research.google.com/drive/1XWnTrv-1BIepiMH4ROlRkiZMV2_gAw27?usp=sharing */
+
 
 # Import Required Libraries
 import pandas as pd
