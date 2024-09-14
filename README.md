@@ -1,1 +1,130 @@
-# Machine-Learning-Project-
+# Machine-Learning-Project
+#MACHINE LEARNING PROJECT ON HEART DISEASE DATASET
+
+
+# Import Required Libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from xgboost import XGBClassifier
+from sklearn.metrics import roc_auc_score
+
+# Load the Dataset
+df = pd.read_csv('heart.csv')
+
+# Data Exploration
+print("First 5 rows of the dataset:")
+print(df.head())
+
+print("\nSummary Statistics:")
+print(df.describe())
+
+print("\nDataset Information:")
+print(df.info())
+
+# Visualizing Data Distributions
+plt.figure(figsize=(10, 6))
+sns.histplot(df['age'], kde=True, bins=20, color='blue')
+plt.title('Age Distribution')
+plt.show()
+
+# Gender distribution and heart disease presence
+plt.figure(figsize=(6, 4))
+sns.countplot(data=df, x='sex', hue='target')
+plt.title('Heart Disease by Gender')
+plt.xticks([0, 1], ['Female', 'Male'])
+plt.show()
+
+# Cholesterol vs target
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=df, x='target', y='chol')
+plt.title('Cholesterol Distribution by Heart Disease')
+plt.show()
+
+# Resting Blood Pressure vs target
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=df, x='target', y='trestbps')
+plt.title('Resting Blood Pressure by Heart Disease')
+plt.show()
+
+# Correlation Heatmap
+plt.figure(figsize=(12, 8))
+sns.heatmap(df.corr(), annot=True, fmt='.2f', cmap='coolwarm')
+plt.title('Feature Correlations')
+plt.show()
+
+# Preprocessing and Feature Scaling
+X = df.drop('target', axis=1)
+y = df['target']
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Standardize the features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Logistic Regression Model
+lr_model = LogisticRegression()
+lr_model.fit(X_train_scaled, y_train)
+
+# Logistic Regression Predictions and Evaluation
+y_pred_lr = lr_model.predict(X_test_scaled)
+print("\nLogistic Regression Model Evaluation:")
+print("Accuracy:", accuracy_score(y_test, y_pred_lr))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_lr))
+print("Classification Report:\n", classification_report(y_test, y_pred_lr))
+
+# Random Forest Model
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+
+# Random Forest Predictions and Evaluation
+y_pred_rf = rf_model.predict(X_test)
+print("\nRandom Forest Model Evaluation:")
+print("Accuracy:", accuracy_score(y_test, y_pred_rf))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_rf))
+print("Classification Report:\n", classification_report(y_test, y_pred_rf))
+
+# Feature Importance Plot for Random Forest
+plt.figure(figsize=(10, 6))
+sns.barplot(x=rf_model.feature_importances_, y=X.columns)
+plt.title('Feature Importance from Random Forest')
+plt.show()
+
+# XGBoost Model
+xgb_model = XGBClassifier(use_label_encoder=False, eval_metric='logloss')
+xgb_model.fit(X_train, y_train)
+
+# XGBoost Predictions and Evaluation
+y_pred_xgb = xgb_model.predict(X_test)
+print("\nXGBoost Model Evaluation:")
+print("Accuracy:", accuracy_score(y_test, y_pred_xgb))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_xgb))
+print("Classification Report:\n", classification_report(y_test, y_pred_xgb))
+
+# ROC-AUC Score for XGBoost
+print("XGBoost ROC-AUC Score:", roc_auc_score(y_test, y_pred_xgb))
+
+# Confusion Matrix Visualizations
+plt.figure(figsize=(6, 6))
+sns.heatmap(confusion_matrix(y_test, y_pred_lr), annot=True, fmt='d', cmap='Blues')
+plt.title('Confusion Matrix - Logistic Regression')
+plt.show()
+
+plt.figure(figsize=(6, 6))
+sns.heatmap(confusion_matrix(y_test, y_pred_rf), annot=True, fmt='d', cmap='Greens')
+plt.title('Confusion Matrix - Random Forest')
+plt.show()
+
+plt.figure(figsize=(6, 6))
+sns.heatmap(confusion_matrix(y_test, y_pred_xgb), annot=True, fmt='d', cmap='Oranges')
+plt.title('Confusion Matrix - XGBoost')
+plt.show()
